@@ -1,0 +1,6 @@
+* Tests (minitest, anyone?)
+* Gemify
+* Use DataMapper::Sweeper, or something like it, to tie into Rails Controllers
+* Update to `Action.has n, :versions` and use the current action uuid thread-locally
+  (instead of ActorTracking)
+  * this will allow undoing a specific action including restoring (versioned) associations
