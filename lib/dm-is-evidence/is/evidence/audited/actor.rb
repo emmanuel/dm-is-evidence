@@ -6,10 +6,9 @@ module DataMapper::Is::Evidence
 
         action_model = model.action_model
 
-        model.has Infinity, :audited_actions,
-                            child_key:  :actor_id,
-                            model:      action_model,
-                            repository: action_model.default_repository_name
+        model.has Infinity, :audited_actions, action_model,
+                            :child_key  => [:actor_id],
+                            :repository => action_model.default_repository_name
       end
 
       # TODO: figure out how to OUTER JOIN all the action_model.subclasses to
@@ -17,7 +16,7 @@ module DataMapper::Is::Evidence
       # OR just live with one query per versioned model & sorting in Ruby.
       def audited_versions
         action_base_model = model.action_model
-        # poor man's UNION across models/tables/types :/
+        # poor man's UNION across models/tables/types :(
         mixed_list = []
         action_base_model.descendants.each do |sti_model|
           mixed_list.concat sti_model.all(:actor => self).versions.to_a
@@ -27,7 +26,7 @@ module DataMapper::Is::Evidence
 
       def audited_resources
         action_base_model = model.action_model
-        # poor man's UNION across models/tables/types :/
+        # poor man's UNION across models/tables/types :(
         mixed_list = []
         action_base_model.descendants.each do |sti_model|
           mixed_list.concat sti_model.all(:actor => self).versions.resources.to_a

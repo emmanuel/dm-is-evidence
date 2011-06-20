@@ -7,21 +7,19 @@ module DataMapper::Is::Evidence
         version_model   = model.version_model
         versioned_model = version_model.versioned_model
 
-        model.has 1, :version,
-                     child_key:  :action_id,
-                     model:      version_model,
-                     repository: version_model.default_repository_name
+        model.has 1, :version, version_model,
+                     :child_key  => [:action_id],
+                     :repository => version_model.default_repository_name
 
-        model.has 1, :resource,
-                     through:    :version,
-                     child_key:  :resource_id,
-                     model:      versioned_model,
-                     repository: versioned_model.default_repository_name
+        model.has 1, :resource, versioned_model,
+                     :through    => :version,
+                     :child_key  => [:resource_id],
+                     :repository => versioned_model.default_repository_name
       end
 
       # TODO: specifying this correctly (as a relationship) doesn't work
       def target_resource
-        model.version_model.first(action: self).resource
+        model.version_model.first(:action => self).resource
       end
 
       module ClassMethods

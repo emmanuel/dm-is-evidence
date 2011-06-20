@@ -15,7 +15,7 @@ module DataMapper::Is::Evidence
         # is set, and therefore before the new model has a non-nil model.name.
         self.module_eval <<-RUBY, __FILE__, __LINE__ + 1
           class Action < #{action_base_model.name}
-            is :an_action, on: #{self.name}
+            is :an_action, :on => #{self.name}
           end
         RUBY
       end

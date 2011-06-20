@@ -8,10 +8,9 @@ module DataMapper::Is::Evidence
         # soft-delete versioned resources to preserve referential integrity
         model.property :deleted_at, DataMapper::Property::ParanoidDateTime
 
-        model.has Infinity, :versions,
-                            child_key:  :resource_id,
-                            repository: version_model.default_repository_name,
-                            model:      version_model
+        model.has Infinity, :versions, version_model,
+                            :child_key  => [:resource_id],
+                            :repository => version_model.default_repository_name
 
         model.before :save do
           @_previous_original_attributes = original_attributes.dup.freeze
@@ -23,7 +22,7 @@ module DataMapper::Is::Evidence
 
         model.after :update do
           if clean? && _previous_original_attributes.any?
-            # deleted_at is set on destroy by ParanoidDateTime
+            # deleted_at is set on destroy by ParanoidDateTime (instead of destroying)
             event = deleted_at.nil? ? :update : :destroy
             # ParanoidDateTime sets persisted_state to Immutable,
             # so don't try to clear @_previous_original_attributes
@@ -59,6 +58,7 @@ module DataMapper::Is::Evidence
       module ClassMethods
         attr_reader :version_model, :versioned_on
       end # module ClassMethods
+
     end # module Resource
   end # module Versioned
 end # module DataMapper::Is::Evidence

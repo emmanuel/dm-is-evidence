@@ -10,15 +10,14 @@ module DataMapper::Is::Evidence
         versioned_model = model.versioned_model# .to_s
         raise "#{model}.versioned_model must be set" unless versioned_model
 
-        model.property :resource_id, DataMapper::Property::Integer,         key: true, index: :resource
-        model.property :created_at,  DataMapper::Property::CreatedDateTime, key: true
-        model.property :event,       DataMapper::Property::String,  set: Versioned::EVENTS
+        model.property :resource_id, DataMapper::Property::Integer,         :key => true, :index => :resource
+        model.property :created_at,  DataMapper::Property::CreatedDateTime, :key => true
+        model.property :event,       DataMapper::Property::String, :set => Versioned::EVENTS
         model.property :data,        DataMapper::Property::Json
 
-        model.belongs_to :resource,
-                         child_key: :resource_id,
-                         repository: versioned_model.default_repository_name,
-                         model:      versioned_model
+        model.belongs_to :resource, versioned_model,
+                         :child_key  => [:resource_id],
+                         :repository => versioned_model.default_repository_name
       end
 
       def reify
@@ -42,25 +41,15 @@ module DataMapper::Is::Evidence
 
         def record_event(resource, event, options = {})
           resource_attributes = resource.attributes(:field)
-          version_attributes = merge_version_metadata(resource: resource,
-                                                      event:    event,
-                                                      data:     resource_attributes)
-          create version_attributes.merge(options)
+          version_attributes  = {
+            :resource => resource,
+            :event    => event,
+            :data     => resource_attributes
+          }.merge(options)
+
+          create version_attributes
         end
 
-        # @api private
-        # TODO: consider supporting block (yield resource) & symbol (send) values
-        def merge_version_metadata(data = {})
-          version_metadata.merge(data)
-        end
-
-        # override ResourceVersionClass.version_metadata to provide additional
-        # attributes to be passed to the ResourceVersionClass.create call
-        # 
-        # @api public
-        def version_metadata
-          {}
-        end
       end # module ClassMethods
     end # module ResourceVersion
   end # module Versioned

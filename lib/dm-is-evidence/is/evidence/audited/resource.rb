@@ -5,7 +5,7 @@ module DataMapper::Is::Evidence
         model.extend ClassMethods
 
         # configure model.version_class as an audited version (belongs_to :action)
-        model::Version.is :a_version, of: model, audit: model.actor_model
+        model::Version.is :a_version, :of => model, :audit => model.actor_model
       end
 
       # Specifying this as a relationship didn't work, but this does
@@ -21,6 +21,7 @@ module DataMapper::Is::Evidence
       module ClassMethods
         attr_reader :actor_model, :audited_on
       end # module ClassMethods
+
     end # module Resource
   end # module Audited
 end # module DataMapper::Is::Evidence
