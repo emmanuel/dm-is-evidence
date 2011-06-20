@@ -20,8 +20,8 @@ module DataMapper::Is::Evidence
         RUBY
       end
 
-      unless self < DataMapper::IsEvidence::Versioned::Resource
-        @versioned_on ||= DataMapper::IsEvidence::Model.filter_properties(properties, options)
+      unless self < DataMapper::Is::Evidence::Versioned::Resource
+        @versioned_on ||= DataMapper::Is::Evidence::Model.filter_properties(properties, options)
 
         # TODO: create version model if not already defined. something like:
         #   if !defined?(self::Version)
@@ -30,29 +30,30 @@ module DataMapper::Is::Evidence
         #   end
         #   @version_model = self::Version
 
-        include DataMapper::IsEvidence::Versioned::Resource
+        include DataMapper::Is::Evidence::Versioned::Resource
       end
 
-      if audited and !(self < DataMapper::IsEvidence::Audited::Resource)
-        @audited_on  ||= DataMapper::IsEvidence::Model.filter_properties(properties, audit_options)
-        @actor_model ||= audit_options.fetch(:actor) { DataMapper::IsEvidence.actor_model }
+      if audited and !(self < DataMapper::Is::Evidence::Audited::Resource)
+        @audited_on  ||= DataMapper::Is::Evidence::Model.filter_properties(properties, audit_options)
+        @actor_model ||= audit_options.fetch(:actor) { DataMapper::Is::Evidence.actor_model }
 
-        include DataMapper::IsEvidence::Audited::Resource
+        include DataMapper::Is::Evidence::Audited::Resource
       end
     end
 
     def is_audited_actor(options = {})
       @action_model = options.fetch(:action) { raise ArgumentError, "expected :action option" }
 
-      include DataMapper::IsEvidence::Audited::Actor
+      include DataMapper::Is::Evidence::Audited::Actor
     end
 
     def self.filter_properties(properties, options)
       property_list  = options.fetch(:on) { properties.map { |p| p.name } }
       property_list -= options.fetch(:ignore) { [] }
+      # properties.values_at(*property_list)
       property_list.map { |name| properties[name] }
     end
   end # module Model
-end # module DataMapper::IsEvidence
+end # module DataMapper::Is::Evidence
 
-DataMapper::Model.send(:include, DataMapper::IsEvidence::Model)
+DataMapper::Model.send(:include, DataMapper::Is::Evidence::Model)
