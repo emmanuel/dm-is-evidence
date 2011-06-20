@@ -5,7 +5,6 @@ module DataMapper::Is::Evidence
     module ResourceVersion
       def self.included(model)
         model.extend ClassMethods
-        # model.__send__ :include, Immutable
 
         versioned_model = model.versioned_model# .to_s
         raise "#{model}.versioned_model must be set" unless versioned_model
@@ -24,13 +23,21 @@ module DataMapper::Is::Evidence
         data = self.data
 
         versioned_model = model.versioned_model
-        discriminator   = versioned_model.properties.discriminator
-        versioned_model = discriminator.load(data[discriminator.field.to_s]) if discriminator
-        # WARNING: this uses the current schema (versioned_model.properties) to load the data.
-        # Fields no longer present in the schema will be omitted, changed Property
-        # will pass through the current Property#load that bears the name, so results will vary
-        query           = versioned_model.all.query
+        if discriminator = versioned_model.properties.discriminator
+          discriminator_value = data[discriminator.field.to_s]
+          versioned_model = discriminator.load(discriminator_value)
+        end
+        # TODO: use :fields => versioned_model.properties_with_subclasses
+        # to load properties defined for STI descendants but not the base model
+        query = versioned_model.all.query
 
+        # WARNING: Results across schema change are undefined
+        # This uses the current schema (versioned_model.properties) to load the
+        # data for a historical version. The versioned model may have been
+        # updated since this version was created. Fields no longer present in
+        # the schema will be omitted, Properties with changed definitions will
+        # pass through the version data through the current Property#load that
+        # bears the same name.
         reified = versioned_model.load([ data ], query).first
         reified.persisted_state = DataMapper::Resource::State::Immutable.new(reified)
         reified
@@ -40,6 +47,8 @@ module DataMapper::Is::Evidence
         attr_reader :versioned_model
 
         def record_event(resource, event, options = {})
+          # retrieve Resource#attributes keyed by field for cold storage
+          # TODO: is Property#field or Property#name more likely stable over time?
           resource_attributes = resource.attributes(:field)
           version_attributes  = {
             :resource => resource,
