@@ -2,7 +2,7 @@ module DataMapper::Is::Evidence
   module Versioned
     EVENTS = %w[create update destroy]
 
-    module Version
+    module ResourceVersion
       def self.included(model)
         model.extend ClassMethods
         # model.__send__ :include, Immutable

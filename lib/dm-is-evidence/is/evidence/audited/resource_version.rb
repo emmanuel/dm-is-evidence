@@ -1,6 +1,6 @@
 module DataMapper::Is::Evidence
   module Audited
-    module Version
+    module ResourceVersion
       def self.included(model)
         model.extend ClassMethods
 
@@ -33,7 +33,7 @@ module DataMapper::Is::Evidence
           if audited_and_changed.any?
             attribute_changes = resource.attribute_changes
             audited_changes = DataMapper::Ext::Hash.only(attribute_changes, *audited_properties)
-            # dump by field name; that's how model.load works (in Version#reify)
+            # dump by field name; that's how model.load works (in ResourceVersion#reify)
             audited_field_changes = Hash[audited_changes.map { |p,v| [p.field, v] }]
             action = action_model.create(actor:    DataMapper::Is::Evidence.current_actor,
                                          event:    event,
@@ -48,6 +48,6 @@ module DataMapper::Is::Evidence
           DataMapper::Is::Evidence.auditing_metadata.merge(super)
         end
       end
-    end # module Version
+    end # module ResourceVersion
   end # module Audited
 end # module DataMapper::Is::Evidence
