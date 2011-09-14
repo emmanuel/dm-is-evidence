@@ -26,17 +26,10 @@ module DataMapper::Is::Evidence
         attr_reader :action_model, :actor_model
 
         def record_event(resource, event, options = {})
-          audited_properties  = resource.model.audited_on
-          changed_properties  = resource._previous_original_attributes.keys
-          audited_and_changed = changed_properties & audited_properties
-          if audited_and_changed.any?
-            attribute_changes = resource.attribute_changes
-            audited_changes = DataMapper::Ext::Hash.only(attribute_changes, *audited_properties)
-            # dump by field name; that's how model.load works (in ResourceVersion#reify)
-            audited_field_changes = Hash[audited_changes.map { |p,v| [p.field, v] }]
+          if resource.changed_audited_properties.any?
             action = action_model.create(:actor   => DataMapper::Is::Evidence.current_actor,
                                          :event   => event,
-                                         :changes => audited_field_changes)
+                                         :changes => resource.audited_field_changes)
             super(resource, event, options.merge(:action => action))
           else
             super

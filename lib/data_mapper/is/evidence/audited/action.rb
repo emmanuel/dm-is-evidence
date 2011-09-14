@@ -33,6 +33,6 @@ module DataMapper::Is::Evidence
         #   @version_model ||= relationships[:version].target_model
         # end
       end
-    end # module ResourceAudit
+    end # module Action
   end # module Audited
 end # module DataMapper::Is::Evidence
