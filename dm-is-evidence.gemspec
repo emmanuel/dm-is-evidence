@@ -1,6 +1,5 @@
 # -*- encoding: utf-8 -*-
-$:.push File.expand_path("../lib", __FILE__)
-require "dm-is-evidence/version"
+require File.expand_path("../lib/data_mapper/is/evidence/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "dm-is-evidence"
