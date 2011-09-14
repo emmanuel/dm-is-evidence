@@ -9,8 +9,9 @@ module DataMapper::Is::Evidence
         versioned_model = model.versioned_model# .to_s
         raise "#{model}.versioned_model must be set" unless versioned_model
 
-        model.property :resource_id, DataMapper::Property::Integer,  :key => true, :index => :resource
-        model.property :created_at,  DataMapper::Property::DateTime, :key => true, :default => proc { DateTime.now }
+        model.property :id,          DataMapper::Property::Serial
+        model.property :resource_id, DataMapper::Property::Integer,  :index => :resource
+        model.property :created_at,  DataMapper::Property::DateTime, :default => proc { DateTime.now }
         model.property :event,       DataMapper::Property::String, :set => Versioned::EVENTS
         model.property :data,        DataMapper::Property::Json
 
