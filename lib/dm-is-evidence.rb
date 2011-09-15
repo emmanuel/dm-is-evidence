@@ -1,10 +1,10 @@
 require 'dm-core'
 require 'dm-types'
 
-require 'data_mapper/is/evidence/actor_tracking'
+require 'data_mapper/is/evidence/version'
+
 require 'data_mapper/is/evidence/model'
-require 'data_mapper/is/evidence/resource_version'
-require 'data_mapper/is/evidence/action'
+require 'data_mapper/is/evidence/actor_tracking'
 
 require 'data_mapper/is/evidence/versioned/resource'
 require 'data_mapper/is/evidence/versioned/resource_version'

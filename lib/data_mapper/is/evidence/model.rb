@@ -37,12 +37,49 @@ module DataMapper::Is::Evidence
         @audited_on  ||= DataMapper::Is::Evidence::Model.filter_properties(properties, audit_options)
         @actor_model ||= audit_options.fetch(:actor) { DataMapper::Is::Evidence.actor_model }
 
+
+    # call VersionedResource::Version.is :a_version, :of => VersionedResource
+    def is_a_version(options = {})
+      @versioned_model ||= options[:of] or raise "expected :of option (versioned model)"
+      class << @versioned_model
+        attr_accessor :version_model
+      end
+      @versioned_model.version_model = self
+
+      include Versioned::ResourceVersion unless self < Versioned::ResourceVersion
+
+      if actor_model = options[:audit]
+        actor_model = DataMapper::Is::Evidence.actor_model unless actor_model.kind_of?(DataMapper::Resource)
+        @actor_model  = actor_model
+        @action_model = options.fetch(:action) { versioned_model::Action }
+
+        include Audited::ResourceVersion unless self < Audited::ResourceVersion
+      end
+    end
+
+
+    # call ActorModel.is :audited_actor
         include DataMapper::Is::Evidence::Audited::Resource
       end
     end
 
     def is_audited_actor(options = {})
       @action_model = options.fetch(:action) { raise ArgumentError, "expected :action option" }
+
+    # call ActorModel::Action.is :an_action
+    def is_an_action(options = {})
+      if audited_model = options[:on]
+        @audited_model = audited_model
+        @version_model = options.fetch(:version) { @audited_model::Version }
+
+        include Audited::Action
+      else
+        @actor_model = options.fetch(:by) { DataMapper::Is::Evidence.actor_model }
+
+        include Audited::AuditedAction
+      end
+    end
+
 
       include DataMapper::Is::Evidence::Audited::Actor
     end
