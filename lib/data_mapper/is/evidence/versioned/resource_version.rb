@@ -9,6 +9,11 @@ module DataMapper::Is::Evidence
         versioned_model = model.versioned_model# .to_s
         raise "#{model}.versioned_model must be set" unless versioned_model
 
+        class << versioned_model
+          attr_accessor :version_model
+        end
+        versioned_model.version_model = model
+
         model.property :id,          DataMapper::Property::Serial
         model.property :resource_id, DataMapper::Property::Integer,  :index => :resource
         model.property :created_at,  DataMapper::Property::DateTime, :default => proc { DateTime.now }
@@ -18,6 +23,10 @@ module DataMapper::Is::Evidence
         model.belongs_to :resource, versioned_model,
                          :child_key  => [:resource_id],
                          :repository => versioned_model.default_repository_name
+
+        versioned_model.has Infinity, :versions, model,
+                            :child_key  => [:resource_id],
+                            :repository => model.default_repository_name
       end
 
       def reify
@@ -48,13 +57,12 @@ module DataMapper::Is::Evidence
         attr_reader :versioned_model
 
         def record_event(resource, event, options = {})
-          # retrieve Resource#attributes keyed by field for cold storage
-          # TODO: is Property#field or Property#name more likely stable over time?
-          resource_attributes = resource.attributes(:field)
           version_attributes  = {
             :resource => resource,
             :event    => event,
-            :data     => resource_attributes
+            # retrieve Resource#attributes keyed by field for cold storage
+            # TODO: is Property#field or Property#name more likely stable over time?
+            :data     => resource.attributes(:field),
           }.merge(options)
 
           create version_attributes

@@ -4,13 +4,8 @@ module DataMapper::Is::Evidence
       def self.included(model)
         model.extend ClassMethods
 
-        version_model = model::Version
         # soft-delete versioned resources to preserve referential integrity
         model.property :deleted_at, DataMapper::Property::ParanoidDateTime
-
-        model.has Infinity, :versions, version_model,
-                            :child_key  => [:resource_id],
-                            :repository => version_model.default_repository_name
 
         model.before :save do
           @_previous_original_attributes = original_attributes.dup.freeze
@@ -56,7 +51,7 @@ module DataMapper::Is::Evidence
       end
 
       module ClassMethods
-        attr_reader :version_model, :versioned_on
+        attr_reader :versioned_on
       end # module ClassMethods
 
     end # module Resource
