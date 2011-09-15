@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module Versioned
     EVENTS = %w[create update destroy]
 
@@ -71,4 +71,4 @@ module DataMapper::Is::Evidence
       end # module ClassMethods
     end # module ResourceVersion
   end # module Versioned
-end # module DataMapper::Is::Evidence
+end # module DataMapper::Model::Is::Evidence

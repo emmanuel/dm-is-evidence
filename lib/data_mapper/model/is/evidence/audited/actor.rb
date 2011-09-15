@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module Audited
     module Actor
       def self.included(model)
@@ -39,4 +39,4 @@ module DataMapper::Is::Evidence
       end
     end # module Actor
   end # module Audited
-end # module DataMapper::Is::Evidence
+end # module DataMapper::Model::Is::Evidence

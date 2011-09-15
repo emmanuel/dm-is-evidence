@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module Versioned
     module Resource
       def self.included(model)
@@ -56,4 +56,4 @@ module DataMapper::Is::Evidence
 
     end # module Resource
   end # module Versioned
-end # module DataMapper::Is::Evidence
+end # module DataMapper::Model::Is::Evidence

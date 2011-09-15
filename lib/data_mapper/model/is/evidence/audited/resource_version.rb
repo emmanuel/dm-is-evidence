@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module Audited
     module ResourceVersion
       def self.included(model)
@@ -27,7 +27,7 @@ module DataMapper::Is::Evidence
 
         def record_event(resource, event, options = {})
           if resource.changed_audited_properties.any?
-            action = action_model.create(:actor   => DataMapper::Is::Evidence.current_actor,
+            action = action_model.create(:actor   => DataMapper::Model::Is::Evidence.current_actor,
                                          :event   => event,
                                          :changes => resource.audited_field_changes)
             super(resource, event, options.merge(:action => action))
@@ -37,10 +37,10 @@ module DataMapper::Is::Evidence
         end
 
         def version_metadata
-          DataMapper::Is::Evidence.auditing_metadata.merge(super)
+          DataMapper::Model::Is::Evidence.auditing_metadata.merge(super)
         end
       end # module ClassMethods
 
     end # module ResourceVersion
   end # module Audited
-end # module DataMapper::Is::Evidence
+end # module DataMapper::Model::Is::Evidence

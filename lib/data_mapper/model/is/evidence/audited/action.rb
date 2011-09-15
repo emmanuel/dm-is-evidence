@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module Audited
     module Action
       def self.included(model)
@@ -35,4 +35,4 @@ module DataMapper::Is::Evidence
       end
     end # module Action
   end # module Audited
-end # module DataMapper::Is::Evidence
+end # module DataMapper::Model::Is::Evidence

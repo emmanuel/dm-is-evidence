@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module Model
     def is_versioned(options = {})
       # TODO: deal with inheritance of these class ivars
@@ -22,7 +22,7 @@ module DataMapper::Is::Evidence
 
       if audited and !(self < Audited::Resource)
         @audited_on  ||= Model.filter_properties(properties, audit_options)
-        @actor_model ||= audit_options.fetch(:actor) { DataMapper::Is::Evidence.actor_model }
+        @actor_model ||= audit_options.fetch(:actor) { DataMapper::Model::Is::Evidence.actor_model }
         action_base_model = audit_options.fetch(:via, nil)
 
         if !defined?(self::Action) and action_base_model
@@ -49,7 +49,7 @@ module DataMapper::Is::Evidence
       include Versioned::ResourceVersion unless self < Versioned::ResourceVersion
 
       if actor_model = options[:audit]
-        actor_model = DataMapper::Is::Evidence.actor_model unless actor_model.kind_of?(DataMapper::Resource)
+        actor_model = DataMapper::Model::Is::Evidence.actor_model unless actor_model.kind_of?(DataMapper::Resource)
         @actor_model  = actor_model
         @action_model = options.fetch(:action) { versioned_model::Action }
 
@@ -74,7 +74,7 @@ module DataMapper::Is::Evidence
 
         include Audited::Action
       else
-        @actor_model = options.fetch(:by) { DataMapper::Is::Evidence.actor_model }
+        @actor_model = options.fetch(:by) { DataMapper::Model::Is::Evidence.actor_model }
 
         include Audited::AuditedAction
       end
@@ -87,6 +87,6 @@ module DataMapper::Is::Evidence
       property_list.map { |name| properties[name] }
     end
   end # module Model
-end # module DataMapper::Is::Evidence
+end # module DataMapper::Model::Is::Evidence
 
-DataMapper::Model.send(:include, DataMapper::Is::Evidence::Model)
+DataMapper::Model.send(:include, DataMapper::Model::Is::Evidence::Model)

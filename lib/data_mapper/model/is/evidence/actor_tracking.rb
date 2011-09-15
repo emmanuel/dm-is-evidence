@@ -1,4 +1,4 @@
-module DataMapper::Is::Evidence
+module DataMapper::Model::Is::Evidence
   module ActorTracking
     def actor_model
       Admin
@@ -43,4 +43,4 @@ module DataMapper::Is::Evidence
   end # module ActorTracking
 
   extend ActorTracking
-end # module DataMapper::Is::Evidence
+end # DataMapper::Model::Is::Evidence

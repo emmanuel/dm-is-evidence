@@ -3,7 +3,7 @@ require File.expand_path("../lib/data_mapper/is/evidence/version", __FILE__)
 
 Gem::Specification.new do |s|
   s.name        = "dm-is-evidence"
-  s.version     = DataMapper::Is::Evidence::VERSION
+  s.version     = DataMapper::Model::Is::Evidence::VERSION
   s.authors     = ["Emmanuel Gomez"]
   s.email       = ["emmanuel.gomez@gmail.com"]
   s.homepage    = ""
