@@ -1,0 +1,17 @@
+class User
+  include DataMapper::Resource
+
+  is :audited_actor
+end
+
+class VersionOfTrackedResource
+  include DataMapper::Resource
+
+  is :a_version, :of => TrackedResource
+end
+
+class TrackedResource
+  include DataMapper::Resource
+
+  is :versioned
+end

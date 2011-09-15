@@ -17,7 +17,7 @@ module DataMapper::Model::Is::Evidence
         model.property :id,          DataMapper::Property::Serial
         model.property :resource_id, DataMapper::Property::Integer,  :index => :resource
         model.property :created_at,  DataMapper::Property::DateTime, :default => proc { DateTime.now }
-        model.property :event,       DataMapper::Property::String, :set => Versioned::EVENTS
+        model.property :event,       DataMapper::Property::String# , :set => Versioned::EVENTS
         model.property :data,        DataMapper::Property::Json
 
         model.belongs_to :resource, versioned_model,

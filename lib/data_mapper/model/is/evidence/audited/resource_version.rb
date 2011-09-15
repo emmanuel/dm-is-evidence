@@ -10,7 +10,7 @@ module DataMapper::Model::Is::Evidence
         # TODO: update DataMapper::Association::Relationship to accept
         # :index / :unique_index options and pass them through to generated
         # child keys (eg., in belongs_to :action, pass through to :action_id)
-        model.property :action_id, Integer, required: false, unique_index: true
+        model.property :action_id, Integer, :required => false, :unique_index => true
 
         model.belongs_to :action, action_model,
                          :child_key  => [:action_id],
