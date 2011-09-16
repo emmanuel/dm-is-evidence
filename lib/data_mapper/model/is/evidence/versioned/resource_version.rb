@@ -59,12 +59,19 @@ module DataMapper::Model::Is::Evidence
         attr_reader :versioned_model
 
         def record_event(resource, event, options = {})
+          # retrieve Resource#attributes keyed by field for cold storage
+          # use Property#dump in order to store primitive values
+          # TODO: is Property#field or Property#name more likely stable over time?
+          properties = resource.__send__(:properties)
+          resource.__send__(:lazy_load, properties)
+          dumped_attributes = Hash[properties.map do |property|
+            [property.field, property.dump(property.get(resource))]
+          end]
+
           version_attributes  = {
             :resource => resource,
             :event    => event,
-            # retrieve Resource#attributes keyed by field for cold storage
-            # TODO: is Property#field or Property#name more likely stable over time?
-            :data     => resource.attributes(:field),
+            :data     => dumped_attributes,
           }.merge(options)
 
           create version_attributes
