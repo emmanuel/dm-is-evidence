@@ -39,7 +39,9 @@ module DataMapper::Model::Is::Evidence
         end
         # TODO: use :fields => versioned_model.properties_with_subclasses
         # to load properties defined for STI descendants but not the base model
-        query = versioned_model.all.query
+        # ALSO: this ensures that lazy properties will be loaded (they are dumped)
+        properties_to_load = versioned_model.properties_with_subclasses
+        query = versioned_model.all(:fields => properties_to_load).query
 
         # WARNING: Results across schema change are undefined
         # This uses the current schema (versioned_model.properties) to load the
