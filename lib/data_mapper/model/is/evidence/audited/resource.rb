@@ -1,11 +1,13 @@
 module DataMapper::Model::Is::Evidence
   module Audited
     module Resource
-      def self.included(model)
-        model.extend ClassMethods
+      def self.included(audited_model)
+        audited_model.extend ClassMethods
 
-        # configure model.version_class as an audited version (belongs_to :action)
-        model::Version.is :a_version, :of => model, :audit => model.actor_model
+        # configure audited_model.version_model as an audited version (belongs_to :action)
+        audited_model::Version.is :a_version,
+                                  :of    => audited_model,
+                                  :audit => audited_model.actor_model
       end
 
       def changed_audited_properties
