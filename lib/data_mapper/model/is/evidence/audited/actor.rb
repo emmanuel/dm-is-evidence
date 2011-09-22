@@ -1,14 +1,16 @@
 module DataMapper::Model::Is::Evidence
   module Audited
     module Actor
-      def self.included(model)
-        model.extend ClassMethods
+      def self.included(actor_model)
+        actor_model.extend ClassMethods
 
-        action_model = model.action_model
+        action_model = actor_model.action_model
 
-        model.has Infinity, :audited_actions, action_model,
-                            :child_key  => [:actor_id],
-                            :repository => action_model.default_repository_name
+        actor_model.class_eval do
+          has n, :audited_actions, action_model,
+                 :child_key  => [:actor_id],
+                 :repository => action_model.default_repository_name
+        end
       end
 
       # TODO: figure out how to OUTER JOIN all the action_model.subclasses to

@@ -1,23 +1,25 @@
 module DataMapper::Model::Is::Evidence
   module Audited
     module Action
-      def self.included(model)
-        model.extend ClassMethods
+      def self.included(action_model)
+        action_model.extend ClassMethods
 
-        version_model   = model.version_model
+        version_model   = action_model.version_model
         versioned_model = version_model.versioned_model
 
-        model.has 1, :version, version_model,
-                     :child_key  => [:action_id],
-                     :repository => version_model.default_repository_name
+        action_model.class_eval do
+          has 1, :version, version_model,
+                 :child_key  => [:action_id],
+                 :repository => version_model.default_repository_name
 
-        model.has 1, :resource, versioned_model,
-                     :through    => :version,
-                     :child_key  => [:resource_id],
-                     :repository => versioned_model.default_repository_name
+          has 1, :resource, versioned_model,
+                 :through    => :version,
+                 :child_key  => [:resource_id],
+                 :repository => versioned_model.default_repository_name
+        end
       end
 
-      # TODO: specifying this correctly (as a relationship) doesn't work
+      # TODO: specifying this correctly (as a relationship) didn't work
       def target_resource
         model.version_model.first(:action => self).resource
       end

@@ -3,30 +3,34 @@ module DataMapper::Model::Is::Evidence
     EVENTS = %w[create update destroy]
 
     module ResourceVersion
-      def self.included(model)
-        model.extend ClassMethods
+      def self.included(version_model)
+        version_model.extend ClassMethods
 
-        versioned_model = model.versioned_model# .to_s
-        raise "#{model}.versioned_model must be set" unless versioned_model
+        versioned_model = version_model.versioned_model# .to_s
+        raise "#{version_model}.versioned_model must be set" unless versioned_model
 
         class << versioned_model
           attr_accessor :version_model
         end
-        versioned_model.version_model = model
+        versioned_model.version_model = version_model
 
-        model.property :id,          DataMapper::Property::Serial
-        model.property :resource_id, DataMapper::Property::Integer,  :index => :resource
-        model.property :created_at,  DataMapper::Property::DateTime, :default => proc { DateTime.now }
-        model.property :event,       DataMapper::Property::String# , :set => Versioned::EVENTS
-        model.property :data,        DataMapper::Property::Json
+        version_model.class_eval do
+          property :id,          DataMapper::Property::Serial
+          property :resource_id, DataMapper::Property::Integer,  :index => :resource
+          property :created_at,  DataMapper::Property::DateTime, :default => proc { DateTime.now }
+          property :event,       DataMapper::Property::String# , :set => Versioned::EVENTS
+          property :data,        DataMapper::Property::Json
 
-        model.belongs_to :resource, versioned_model,
-                         :child_key  => [:resource_id],
-                         :repository => versioned_model.default_repository_name
+          belongs_to :resource, versioned_model,
+                     :child_key  => [:resource_id],
+                     :repository => versioned_model.default_repository_name
+        end
 
-        versioned_model.has Infinity, :versions, model,
-                            :child_key  => [:resource_id],
-                            :repository => model.default_repository_name
+        versioned_model.class_eval do
+          has n, :versions, version_model,
+                 :child_key  => [:resource_id],
+                 :repository => version_model.default_repository_name
+        end
       end
 
       def reify
@@ -59,25 +63,27 @@ module DataMapper::Model::Is::Evidence
         attr_reader :versioned_model
 
         def record_event(resource, event, options = {})
-          # retrieve Resource#attributes keyed by field for cold storage
-          # use Property#dump in order to store primitive values
-          # TODO: is Property#field or Property#name more likely stable over time?
-          properties = resource.__send__(:properties)
-          resource.__send__(:lazy_load, properties)
-          dumped_attributes = Hash[properties.map do |property|
-            [property.field, property.dump(property.get(resource))]
-          end]
-
           version_attributes  = {
             :resource => resource,
             :event    => event,
-            :data     => dumped_attributes,
+            :data     => dump_attributes(resource),
           }.merge(options)
 
           create version_attributes
         end
 
+        def dump_attributes(resource)
+          # retrieve Resource#attributes keyed by field for cold storage
+          # use Property#dump in order to store primitive values
+          # TODO: is Property#field or Property#name more likely stable over time?
+          properties = resource.__send__(:properties)
+          resource.__send__(:lazy_load, properties)
+          Hash[properties.map do |property|
+            [property.field, property.dump(property.get(resource))]
+          end]
+        end
       end # module ClassMethods
+
     end # module ResourceVersion
   end # module Versioned
 end # module DataMapper::Model::Is::Evidence
