@@ -35,15 +35,8 @@ module DataMapper::Model::Is::Evidence
 
       def reify
         data = self.data
-
-        versioned_model = model.versioned_model
-        if discriminator = versioned_model.properties.discriminator
-          discriminator_value = data[discriminator.field.to_s]
-          versioned_model = discriminator.load(discriminator_value)
-        end
-        # TODO: use :fields => versioned_model.properties_with_subclasses
-        # to load properties defined for STI descendants but not the base model
-        # ALSO: this ensures that lazy properties will be loaded (they are dumped)
+        versioned_model = self.versioned_model
+        # Ensures that lazy properties are loaded (they are present in #data)
         properties_to_load = versioned_model.properties_with_subclasses
         query = versioned_model.all(:fields => properties_to_load).query
 
@@ -57,6 +50,17 @@ module DataMapper::Model::Is::Evidence
         reified = versioned_model.load([ data ], query).first
         reified.persisted_state = DataMapper::Resource::State::Immutable.new(reified)
         reified
+      end
+
+      def versioned_model
+        versioned_model = model.versioned_model
+
+        if discriminator = versioned_model.properties.discriminator
+          discriminator_value = data[discriminator.field.to_s]
+          versioned_model = discriminator.load(discriminator_value)
+        end
+
+        versioned_model
       end
 
       module ClassMethods
