@@ -27,6 +27,8 @@ module DataMapper::Model::Is::Evidence
         end
 
         versioned_model.class_eval do
+          attr_accessor :version
+
           has n, :versions, version_model,
                  :child_key  => [:resource_id],
                  :repository => version_model.default_repository_name
@@ -49,6 +51,7 @@ module DataMapper::Model::Is::Evidence
         # bears the same name.
         reified = versioned_model.load([ data ], query).first
         reified.persisted_state = DataMapper::Resource::State::Immutable.new(reified)
+        reified.version = self
         reified
       end
 
