@@ -14,6 +14,15 @@ module DataMapper::Model::Is::Evidence
         end
         versioned_model.version_model = version_model
 
+        versioned_model.class_eval do
+          attr_accessor :version
+
+          has n, :versions, version_model,
+                 :child_key  => [:resource_id],
+                 :repository => version_model.default_repository_name,
+                 :inverse    => :resource
+        end
+
         version_model.class_eval do
           property :id,          DataMapper::Property::Serial
           property :resource_id, DataMapper::Property::Integer,  :index => :resource
@@ -23,15 +32,8 @@ module DataMapper::Model::Is::Evidence
 
           belongs_to :resource, versioned_model,
                      :child_key  => [:resource_id],
-                     :repository => versioned_model.default_repository_name
-        end
-
-        versioned_model.class_eval do
-          attr_accessor :version
-
-          has n, :versions, version_model,
-                 :child_key  => [:resource_id],
-                 :repository => version_model.default_repository_name
+                     :repository => versioned_model.default_repository_name,
+                     :inverse    => :version
         end
       end
 
