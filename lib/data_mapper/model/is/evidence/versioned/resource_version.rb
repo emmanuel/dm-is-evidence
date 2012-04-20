@@ -20,7 +20,8 @@ module DataMapper::Model::Is::Evidence
           has n, :versions, version_model,
                  :child_key  => [:resource_id],
                  :repository => version_model.default_repository_name,
-                 :inverse    => :resource
+                 :inverse    => :resource,
+                 :constraint => :skip
         end
 
         version_model.class_eval do
